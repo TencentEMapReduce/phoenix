@@ -17,7 +17,7 @@
  */
 package org.apache.phoenix.hive.objectinspector;
 
-import org.apache.hadoop.hive.serde2.io.DateWritable;
+import org.apache.hadoop.hive.serde2.io.DateWritableV2;
 import org.apache.hadoop.hive.serde2.objectinspector.primitive.DateObjectInspector;
 import org.apache.hadoop.hive.serde2.typeinfo.TypeInfoFactory;
 
@@ -27,7 +27,7 @@ import java.sql.Date;
  * ObjectInspector for date type
  */
 
-public class PhoenixDateObjectInspector extends AbstractPhoenixObjectInspector<DateWritable>
+public class PhoenixDateObjectInspector extends AbstractPhoenixObjectInspector<DateWritableV2>
         implements DateObjectInspector {
 
     public PhoenixDateObjectInspector() {
@@ -40,15 +40,15 @@ public class PhoenixDateObjectInspector extends AbstractPhoenixObjectInspector<D
     }
 
     @Override
-    public DateWritable getPrimitiveWritableObject(Object o) {
-        DateWritable value = null;
+    public DateWritableV2 getPrimitiveWritableObject(Object o) {
+        DateWritableV2 value = null;
 
         if (o != null) {
             try {
-                value = new DateWritable((Date) o);
+                value = new DateWritableV2((org.apache.hadoop.hive.common.type.Date) o);
             } catch (Exception e) {
                 logExceptionMessage(o, "DATE");
-                value = new DateWritable();
+                value = new DateWritableV2();
             }
         }
 
@@ -56,8 +56,8 @@ public class PhoenixDateObjectInspector extends AbstractPhoenixObjectInspector<D
     }
 
     @Override
-    public Date getPrimitiveJavaObject(Object o) {
-        return (Date) o;
+    public org.apache.hadoop.hive.common.type.Date getPrimitiveJavaObject(Object o) {
+        return (org.apache.hadoop.hive.common.type.Date) o;
     }
 
 }

@@ -41,7 +41,7 @@ public class TestIndexMemStore {
   public void testCorrectOverwritting() throws Exception {
     IndexMemStore store = new IndexMemStore(new CellComparatorImpl(){
         @Override
-        public int compare(Cell a, Cell b) {
+        public int compare(Cell a, Cell b,  boolean ignoreSequenceid) {
             return super.compare(a, b, true);
         }
     });

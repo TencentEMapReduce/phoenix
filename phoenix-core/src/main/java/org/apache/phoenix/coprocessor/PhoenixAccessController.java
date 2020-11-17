@@ -53,12 +53,8 @@ import org.apache.hadoop.hbase.regionserver.RegionCoprocessorHost;
 import org.apache.hadoop.hbase.security.AccessDeniedException;
 import org.apache.hadoop.hbase.security.User;
 import org.apache.hadoop.hbase.security.UserProvider;
-import org.apache.hadoop.hbase.security.access.AccessControlClient;
-import org.apache.hadoop.hbase.security.access.AccessControlUtil;
-import org.apache.hadoop.hbase.security.access.AuthResult;
-import org.apache.hadoop.hbase.security.access.Permission;
+import org.apache.hadoop.hbase.security.access.*;
 import org.apache.hadoop.hbase.security.access.Permission.Action;
-import org.apache.hadoop.hbase.security.access.UserPermission;
 import org.apache.hadoop.hbase.protobuf.ProtobufUtil;
 import org.apache.hadoop.hbase.util.Bytes;
 import com.google.protobuf.ByteString;
@@ -180,16 +176,17 @@ public class PhoenixAccessController extends BaseMetaDataEndpointObserver {
                 Set<Action> requireAccess = new HashSet<>();
                 Set<Action> accessExists = new HashSet<>();
                 if (permissionForUser != null) {
+
                     for (UserPermission userPermission : permissionForUser) {
                         for (Action action : Arrays.asList(requiredActions)) {
-                            if (!userPermission.implies(action)) {
+                            if (!userPermission.getPermission().implies(action)) {
                                 requireAccess.add(action);
                             }
                         }
                     }
                     if (!requireAccess.isEmpty()) {
                         for (UserPermission userPermission : permissionForUser) {
-                            accessExists.addAll(Arrays.asList(userPermission.getActions()));
+                            accessExists.addAll(Arrays.asList(userPermission.getPermission().getActions()));
                         }
 
                     }
@@ -264,15 +261,15 @@ public class PhoenixAccessController extends BaseMetaDataEndpointObserver {
                             Set<Action> requireAccess = new HashSet<Action>();
                             Set<Action> accessExists = new HashSet<Action>();
                             List<UserPermission> permsToTable = getPermissionForUser(permissionsOnTheTable,
-                                    userPermission.getUser());
+                                    userPermission.getUser().getBytes());
                             for (Action action : requiredActionsOnTable) {
                                 boolean haveAccess=false;
-                                if (userPermission.implies(action)) {
+                                if (userPermission.getPermission().implies(action)) {
                                     if (permsToTable == null) {
                                         requireAccess.add(action);
                                     } else {
                                         for (UserPermission permToTable : permsToTable) {
-                                            if (permToTable.implies(action)) {
+                                            if (permToTable.getPermission().implies(action)) {
                                                 haveAccess=true;
                                             }
                                         }
@@ -285,18 +282,18 @@ public class PhoenixAccessController extends BaseMetaDataEndpointObserver {
                             if (permsToTable != null) {
                                 // Append access to already existing access for the user
                                 for (UserPermission permToTable : permsToTable) {
-                                    accessExists.addAll(Arrays.asList(permToTable.getActions()));
+                                    accessExists.addAll(Arrays.asList(permToTable.getPermission().getActions()));
                                 }
                             }
                             if (!requireAccess.isEmpty()) {
-                                if(AuthUtil.isGroupPrincipal(Bytes.toString(userPermission.getUser()))){
-                                    AUDITLOG.warn("Users of GROUP:" + Bytes.toString(userPermission.getUser())
+                                if(AuthUtil.isGroupPrincipal(Bytes.toString(userPermission.getUser().getBytes()))){
+                                    AUDITLOG.warn("Users of GROUP:" + Bytes.toString(userPermission.getUser().getBytes())
                                             + " will not have following access " + requireAccess
                                             + " to the newly created index " + toTable
                                             + ", Automatic grant is not yet allowed on Groups");
                                     continue;
                                 }
-                                handleRequireAccessOnDependentTable(request, Bytes.toString(userPermission.getUser()),
+                                handleRequireAccessOnDependentTable(request, Bytes.toString(userPermission.getUser().getBytes()),
                                         toTable, toTable.getNameAsString(), requireAccess, accessExists);
                             }
                         }
@@ -313,7 +310,7 @@ public class PhoenixAccessController extends BaseMetaDataEndpointObserver {
             // permissions for same users
             List<UserPermission> permissions = new ArrayList<>();
             for (UserPermission p : perms) {
-                if (Bytes.equals(p.getUser(),user)){
+                if (Bytes.equals(p.getUser().getBytes(),user)){
                      permissions.add(p);
                 }
             }
@@ -523,7 +520,7 @@ public class PhoenixAccessController extends BaseMetaDataEndpointObserver {
             List<UserPermission> permissionsForUser = getPermissionForUser(perms, user.getShortName().getBytes());
             if (permissionsForUser != null) {
                 for (UserPermission permissionForUser : permissionsForUser) {
-                    if (permissionForUser.implies(action)) { return true; }
+                    if (permissionForUser.getPermission().implies(action)) { return true; }
                 }
             }
             String[] groupNames = user.getGroupNames();
@@ -531,7 +528,7 @@ public class PhoenixAccessController extends BaseMetaDataEndpointObserver {
               for (String group : groupNames) {
                 List<UserPermission> groupPerms = getPermissionForUser(perms,(AuthUtil.toGroupEntry(group)).getBytes());
                 if (groupPerms != null) for (UserPermission permissionForUser : groupPerms) {
-                    if (permissionForUser.implies(action)) { return true; }
+                    if (permissionForUser.getPermission().implies(action)) { return true; }
                 }
               }
             }

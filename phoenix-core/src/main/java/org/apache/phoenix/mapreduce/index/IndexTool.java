@@ -59,7 +59,7 @@ import org.apache.hadoop.hbase.mapreduce.TableInputFormat;
 import org.apache.hadoop.hbase.mapreduce.TableMapReduceUtil;
 import org.apache.hadoop.hbase.mapreduce.TableOutputFormat;
 import org.apache.hadoop.hbase.util.Bytes;
-import org.apache.hadoop.hbase.util.FSUtils;
+import org.apache.hadoop.hbase.util.CommonFSUtils;
 import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.NullWritable;
 import org.apache.hadoop.mapreduce.Job;
@@ -437,8 +437,8 @@ public class IndexTool extends Configured implements Tool {
                 }
                 // root dir not a subdirectory of hbase dir
                 Path rootDir = new Path("hdfs:///index-snapshot-dir");
-                FSUtils.setRootDir(configuration, rootDir);
-                Path restoreDir = new Path(FSUtils.getRootDir(configuration), "restore-dir");
+                CommonFSUtils.setRootDir(configuration, rootDir);
+                Path restoreDir = new Path(CommonFSUtils.getRootDir(configuration), "restore-dir");
 
                 // set input for map reduce job using hbase snapshots
                 PhoenixMapReduceUtil
