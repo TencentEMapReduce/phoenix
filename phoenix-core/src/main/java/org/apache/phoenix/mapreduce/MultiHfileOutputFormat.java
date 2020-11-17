@@ -265,7 +265,6 @@ public class MultiHfileOutputFormat extends FileOutputFormat<TableRowkeyPair, Ce
                                         
               wl.writer = new StoreFileWriter.Builder(conf, new CacheConfig(tempConf), fs)
                 .withOutputDir(familydir).withBloomType(bloomType)
-                .withComparator(CellComparatorImpl.COMPARATOR)
                 .withFileContext(hFileContext).build();
 
               // join and put it in the writers map .

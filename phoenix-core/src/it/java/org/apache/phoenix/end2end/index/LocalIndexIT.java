@@ -53,7 +53,7 @@ import org.apache.hadoop.hbase.client.Table;
 import org.apache.hadoop.hbase.client.TableDescriptor;
 import org.apache.hadoop.hbase.client.TableDescriptorBuilder;
 import org.apache.hadoop.hbase.util.Bytes;
-import org.apache.hadoop.hbase.util.FSUtils;
+import org.apache.hadoop.hbase.util.CommonFSUtils;
 import org.apache.hadoop.hbase.util.Pair;
 import org.apache.phoenix.compile.QueryPlan;
 import org.apache.phoenix.coprocessor.BaseScannerRegionObserver;
@@ -672,14 +672,14 @@ public class LocalIndexIT extends BaseLocalIndexIT {
 
     private void copyLocalIndexHFiles(Configuration conf, RegionInfo fromRegion, RegionInfo toRegion, boolean move)
             throws IOException {
-        Path root = FSUtils.getRootDir(conf);
+        Path root = CommonFSUtils.getRootDir(conf);
 
-        Path seondRegion = new Path(FSUtils.getTableDir(root, fromRegion.getTable()) + Path.SEPARATOR
+        Path seondRegion = new Path(CommonFSUtils.getTableDir(root, fromRegion.getTable()) + Path.SEPARATOR
                 + fromRegion.getEncodedName() + Path.SEPARATOR + "L#0/");
-        Path hfilePath = FSUtils.getCurrentFileSystem(conf).listFiles(seondRegion, true).next().getPath();
-        Path firstRegionPath = new Path(FSUtils.getTableDir(root, toRegion.getTable()) + Path.SEPARATOR
+        Path hfilePath = CommonFSUtils.getCurrentFileSystem(conf).listFiles(seondRegion, true).next().getPath();
+        Path firstRegionPath = new Path(CommonFSUtils.getTableDir(root, toRegion.getTable()) + Path.SEPARATOR
                 + toRegion.getEncodedName() + Path.SEPARATOR + "L#0/");
-        FileSystem currentFileSystem = FSUtils.getCurrentFileSystem(conf);
+        FileSystem currentFileSystem = CommonFSUtils.getCurrentFileSystem(conf);
         assertTrue(FileUtil.copy(currentFileSystem, hfilePath, currentFileSystem, firstRegionPath, move, conf));
     }
 

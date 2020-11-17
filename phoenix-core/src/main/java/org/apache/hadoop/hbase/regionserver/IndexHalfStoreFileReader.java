@@ -34,6 +34,9 @@ import org.apache.hadoop.hbase.io.FSDataInputStreamWrapper;
 import org.apache.hadoop.hbase.io.ImmutableBytesWritable;
 import org.apache.hadoop.hbase.io.Reference;
 import org.apache.hadoop.hbase.io.hfile.CacheConfig;
+import org.apache.hadoop.hbase.io.hfile.HFileInfo;
+import org.apache.hadoop.hbase.io.hfile.ReaderContext;
+import org.apache.hadoop.hbase.io.hfile.ReaderContextBuilder;
 import org.apache.hadoop.hbase.util.Bytes;
 import org.apache.phoenix.index.IndexMaintainer;
 
@@ -87,9 +90,11 @@ public class IndexHalfStoreFileReader extends StoreFileReader {
             final Map<ImmutableBytesWritable, IndexMaintainer> indexMaintainers,
             final byte[][] viewConstants, final RegionInfo regionInfo,
             byte[] regionStartKeyInHFile, byte[] splitKey, boolean primaryReplicaStoreFile,
-            AtomicInteger refCount, RegionInfo currentRegion) throws IOException {
-        super(fs, p, in, size, cacheConf, primaryReplicaStoreFile, refCount, false,
-                conf);
+            AtomicInteger refCount, RegionInfo currentRegion,
+                                    ReaderContext context,
+                                    HFileInfo fileInfo ) throws IOException {
+        super(context, fileInfo, cacheConf, refCount, conf);
+
         this.splitkey = splitKey == null ? r.getSplitKey() : splitKey;
         // Is it top or bottom half?
         this.top = Reference.isTopFileRegion(r.getFileRegion());
@@ -134,7 +139,7 @@ public class IndexHalfStoreFileReader extends StoreFileReader {
     public boolean isTop() {
         return top;
     }
-    
+
     @Override
     public StoreFileScanner getStoreFileScanner(boolean cacheBlocks, boolean pread,
             boolean isCompaction, long readPt, long scannerOrder,

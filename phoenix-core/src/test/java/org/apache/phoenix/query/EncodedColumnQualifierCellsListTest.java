@@ -494,6 +494,11 @@ public class EncodedColumnQualifierCellsListTest {
         }
 
         @Override
+        public int getSerializedSize() {
+            return 0;
+        }
+
+        @Override
         public byte[] getValueArray() {
             return delegate.getValueArray();
         }
@@ -581,6 +586,11 @@ public class EncodedColumnQualifierCellsListTest {
         @Override
         public Type getType() {
             return delegate.getType();
+        }
+
+        @Override
+        public long heapSize() {
+            return 0;
         }
     }
 }

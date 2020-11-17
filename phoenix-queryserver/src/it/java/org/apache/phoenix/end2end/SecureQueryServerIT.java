@@ -48,7 +48,7 @@ import org.apache.hadoop.hbase.coprocessor.CoprocessorHost;
 import org.apache.hadoop.hbase.http.ssl.KeyStoreTestUtil;
 import org.apache.hadoop.hbase.security.HBaseKerberosUtils;
 import org.apache.hadoop.hbase.security.token.TokenProvider;
-import org.apache.hadoop.hbase.util.FSUtils;
+import org.apache.hadoop.hbase.util.CommonFSUtils;
 import org.apache.hadoop.hdfs.DFSConfigKeys;
 import org.apache.hadoop.http.HttpConfig;
 import org.apache.hadoop.minikdc.MiniKdc;
@@ -232,7 +232,7 @@ public class SecureQueryServerIT {
         // NB. I'm not actually sure what HTU does incorrect, but this was pulled from some test
         //     classes in HBase itself. I couldn't get HTU to work myself (2017/07/06)
         Path rootdir = UTIL.getDataTestDirOnTestFS(SecureQueryServerIT.class.getSimpleName());
-        FSUtils.setRootDir(conf, rootdir);
+        CommonFSUtils.setRootDir(conf, rootdir);
         HBASE_CLUSTER = new LocalHBaseCluster(conf, 1);
         HBASE_CLUSTER.startup();
 

@@ -545,6 +545,11 @@ public class IndexUtil {
             Cell newCell = new Cell() {
 
                 @Override
+                public long heapSize() {
+                    return 0;
+                }
+
+                @Override
                 public byte[] getRowArray() {
                     return cell.getRowArray();
                 }
@@ -616,6 +621,11 @@ public class IndexUtil {
                 @Override
                 public int getValueLength() {
                     return cell.getValueLength();
+                }
+
+                @Override
+                public int getSerializedSize() {
+                    return 0;
                 }
 
                 @Override
